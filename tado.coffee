@@ -4,15 +4,15 @@ module.exports = (env) ->
   Promise = env.require 'bluebird'
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
-  tadoClient = require './client.coffee'
+  tadoClient = require './tadoClient.coffee'
   retry = require 'bluebird-retry'
   commons = require('pimatic-plugin-commons')(env) 
   
-  class TadoPlugin2 extends env.plugins.Plugin
+  class TadoPlugin extends env.plugins.Plugin
 
     init: (app, @framework, @config) =>
       
-      @base= commons.base @, 'TadoPlugin2'
+      @base= commons.base @, 'TadoPlugin'
       @client = new tadoClient
       loginname= @config.loginname
       password = @config.password
@@ -78,7 +78,7 @@ module.exports = (env) ->
       if home?
         @home = home
        
-  plugin = new TadoPlugin2
+  plugin = new TadoPlugin
 
   class ZoneClimate extends env.devices.TemperatureSensor
     _temperature: null
