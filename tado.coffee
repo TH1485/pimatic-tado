@@ -7,8 +7,8 @@ module.exports = (env) ->
   #require tado client
   retry = require 'bluebird-retry'
   commons = require('pimatic-plugin-commons')(env) 
-  #  #tadoClient = require('./tadoClient.coffee')(env) 
-  tadoClient = require './tadoClient.coffee'  
+  tadoClient = require('./tadoClient.coffee')(env) 
+  #tadoClient = require './tadoClient.coffee'  
   
   class TadoPlugin extends env.plugins.Plugin
 
@@ -64,8 +64,8 @@ module.exports = (env) ->
                   name: zone.name
                   interval: 120000
                 }
-              @framework.deviceManager.discoveredDevice(
-                'pimatic-tado', 'ZoneClimate: ' + config.name, config
+                @framework.deviceManager.discoveredDevice(
+                  'pimatic-tado', 'ZoneClimate: ' + config.name, config
               )
             Promise.resolve(zones)
           )
