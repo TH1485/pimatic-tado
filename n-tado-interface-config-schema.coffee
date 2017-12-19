@@ -1,4 +1,4 @@
-# #tado-interface configuration options
+# #pimatic-tado configuration options
 module.exports = {
   title: "my plugin config options"
   type: "object"
