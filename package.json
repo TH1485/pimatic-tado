@@ -1,6 +1,6 @@
 {
-  "name": "pimatic-tado-interface",
-  "description": "pimatic interface Tado Thermostat api",
+  "name": "pimatic-tado",
+  "description": "pimatic Tado Thermostat plugin for pimatic",
   "author": "TH1485",
   "main": "tado",
   "files": [
