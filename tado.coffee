@@ -22,8 +22,8 @@ module.exports = (env) ->
         retry(
         {
           max_tries: 10
-          interval: 100
-          backoff: 2
+          minTimeout: 100
+          factor: 2
           #predicate: ( (err) -> return err.error == "invalid_grant") 
         },() => @client.login(@config.loginname, @config.password)
         ).then((connected) =>
