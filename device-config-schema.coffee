@@ -1,5 +1,5 @@
 module.exports = {
-  title: "pimatic-n-tado-interface device config schemas"
+  title: "pimatic-tado device config schemas"
   ZoneClimate: {
     title: "ZoneClimate config options"
     type: "object"
