@@ -1,0 +1,42 @@
+{
+  "name": "pimatic-n-tado-interface",
+  "description": "pimatic interface Tado Thermostat api through node-tado",
+  "author": "TH1485",
+  "main": "n-tado-interface",
+  "files": [
+    "n-tado-interface.coffee",
+    "README.md",
+    "client.coffee",
+    "n-tado-interface-config-schema.coffee",
+    "device-config-schema.coffee"
+  ],
+  "version": "0.0.3",
+  "homepage": "http://github.com/TH1485/pimatic-n-tado-interface",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TH1485/pimatic-n-tado-interface.git"
+  },
+  "configSchema": "n-tado-interface-config-schema.coffee",
+  "dependencies": {
+    "request": "2.83.0",
+    "moment": "2.19.4",
+    "bluebird-retry": "0.11.0",
+    "pimatic-plugin-commons": "^0.9.3"
+  },
+  "engines": {
+    "node": "4.6.2",
+    "npm": "2.15.11"
+  },
+  "bugs": {
+     "url": "https://github.com/pimatic/pimatic/issues"
+   },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pimatic",
+    "tado"
+  ],
+  "license": "GPL-3.0"
+}
