@@ -1,5 +1,6 @@
 # pimatic-tado
-==================
+================
+
 Tado interface for pimatic
 
 Currently Support for:
@@ -9,10 +10,12 @@ Currently Support for:
 
 ###  Installation on raspberry pi:
 
+```code
 cd /home/pi/pimatic-app/node_modules
 git clone https://github.com/TH1485/pimatic-tado.git
 cd ./pimatic-tado
 npm install
+```
 
 ### Plugin Configuration
 
