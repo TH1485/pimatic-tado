@@ -4,6 +4,7 @@ module.exports = (env) ->
   Promise = env.require 'bluebird'
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
+    #require tado client
   tadoClient = require './tadoClient.coffee'
   retry = require 'bluebird-retry'
   commons = require('pimatic-plugin-commons')(env) 
@@ -12,13 +13,12 @@ module.exports = (env) ->
 
     init: (app, @framework, @config) =>
       
-      @base= commons.base @, 'TadoPlugin'
+      @base = commons.base @, 'TadoPlugin'
       @client = new tadoClient
-      loginname= @config.loginname
-      password = @config.password
-     
+      
+      #connecting to tado web interface and acquiring home id
       @loginPromise =
-        retry(() => @client.login(loginname, password),
+        retry(() => @client.login(@config.loginname, @config.password),
         {
           max_tries: 10
           interval: 100
@@ -50,7 +50,7 @@ module.exports = (env) ->
       
       @framework.deviceManager.on('discover', () =>
         return @loginPromise.then( (success) =>
-          @framework.deviceManager.discoverMessage("pimatic-n-tado", "discovering zones..")
+          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
           return @client.zones(@home.id).then( (zones) =>
             id = null
             for zone in zones
@@ -64,7 +64,7 @@ module.exports = (env) ->
                   interval: 120000
                 }
               @framework.deviceManager.discoveredDevice(
-                'pimatic-n-tado', 'Zone: ' + config.name, config
+                'pimatic-tado', 'ZoneClimate: ' + config.name, config
               )
             Promise.resolve(zones)
           )
@@ -114,7 +114,6 @@ module.exports = (env) ->
       #if plugin.home?.id
       plugin.loginPromise
       .then( (success) =>
-        env.logger.debug("request login?!")
         return plugin.client.state(plugin.home.id, @zone)
         .then( (state) =>
           if @config.debug
@@ -128,11 +127,10 @@ module.exports = (env) ->
       ).catch( (err) =>
         env.logger.error(err)
         if @config.debug
-          env.logger.debug("homeId=:" +plugin.home.id)
+          env.logger.debug("homeId=:" + plugin.home.id)
         Promise.reject(err)
       )
      
-
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
