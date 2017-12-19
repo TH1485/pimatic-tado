@@ -23,6 +23,9 @@
     "bluebird-retry": "^0.11.0",
     "pimatic-plugin-commons": "^0.9.3"
   },
+   "peerDependencies": {
+    "pimatic": ">=0.8.0 <1.0.0"
+  },
   "engines": {
     "node": "4.6.2",
     "npm": "2.15.11"
