@@ -3,7 +3,7 @@ module.exports = (env) ->
   class Client
 
     request = require('request')
-    moment = require('moment')
+    moment = env.require('moment')
     BASE_URL = 'https://my.tado.com'
     AUTH_URL = 'https://auth.tado.com'
     CLIENT_ID = 'tado-web-app'
