@@ -6,7 +6,7 @@ Tado interface for pimatic
 Currently Support for:
 - Tado temperature and humidity readout via the public preview api.
 
-**This plugin is baesed on node-tado (https://github.com/dVelopment/node-tado)
+**This plugin is based on node-tado (https://github.com/dVelopment/node-tado)
 
 ###  Installation on Raspberry PI
 
