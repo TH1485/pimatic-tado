@@ -7,7 +7,7 @@ Currently Support for:
 
 **This plugin is baesed on node-tado (https://github.com/dVelopment/node-tado)
 
-### plugin installation on raspberry pi
+###  Installation on raspberry pi:
 
 cd /home/pi/pimatic-app/node_modules
 git clone https://github.com/TH1485/pimatic-tado.git
