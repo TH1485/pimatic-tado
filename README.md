@@ -4,7 +4,8 @@
 Tado interface for pimatic
 
 Currently Support for:
-- Tado temperature and humidity readout via the public preview api.
+- Tado temperature and humidity device (readout via the public preview api).
+- Discover device (heating zones) via pimatic web interface
 
 **This plugin is based on node-tado (https://github.com/dVelopment/node-tado)
 
