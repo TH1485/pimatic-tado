@@ -18,8 +18,7 @@ module.exports = (env) ->
       @client = new tadoClient
       
       #connecting to tado web interface and acquiring home id
-      @loginPromise =
-        retry(
+      @loginPromise = retry(
         {
           max_tries: 10
           minTimeout: 100
