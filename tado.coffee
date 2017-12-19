@@ -5,7 +5,7 @@ module.exports = (env) ->
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
   #require tado client
-  retry = require 'promise-retry'
+  retry = require 'bluebird-retry'
   commons = require('pimatic-plugin-commons')(env) 
   tadoClient = require('./tadoClient.coffee')(env) 
   #tadoClient = require './tadoClient.coffee'  
@@ -18,13 +18,14 @@ module.exports = (env) ->
       @client = new tadoClient
       
       #connecting to tado web interface and acquiring home id
-      @loginPromise = retry(
+      @loginPromise =
+        retry(() => @client.login(@config.loginname, @config.password),
         {
           max_tries: 10
-          minTimeout: 100
-          factor: 2
+          interval: 100
+          backoff: 2
           #predicate: ( (err) -> return err.error == "invalid_grant") 
-        },() => @client.login(@config.loginname, @config.password)
+        }
         ).then((connected) =>
           env.logger.info("Login established, connected with tado web interface")
           return @client.me().then( (home_info) =>
@@ -134,4 +135,5 @@ module.exports = (env) ->
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
+  
   return plugin
