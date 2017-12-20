@@ -1,7 +1,7 @@
 module.exports = {
   title: "pimatic-tado device config schemas"
-  ZoneClimate: {
-    title: "ZoneClimate config options"
+  TadoClimate: {
+    title: "TadoClimate config options"
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
     properties:
@@ -14,8 +14,8 @@ module.exports = {
         type: "integer"
         default: 120000
     }
-  tadoPresence: {
-    title: "tadoPresence config options"
+  TadoPresence: {
+    title: "TadoPresence config options"
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
     properties:
