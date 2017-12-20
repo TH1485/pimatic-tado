@@ -82,7 +82,7 @@ module.exports = (env) ->
                   interval: 120000
                 }
                 @framework.deviceManager.discoveredDevice(
-                  'pimatic-tado', 'TadoClimate: ' + config.name, config)
+                  'TadoClimate', config.name, config)
             Promise.resolve(true)
           , (err) =>
             env.logger.error(err.error_description || err)
@@ -102,7 +102,7 @@ module.exports = (env) ->
                   interval: 120000
                 }
                 @framework.deviceManager.discoveredDevice(
-                  'pimatic-tado', 'TadoClimate: ' + config.name, config)
+                  'TadoPresence', config.name, config)
             Promise.resolve(true)
           , (err) =>
             env.logger.error(err.error_description || err)
@@ -207,7 +207,8 @@ module.exports = (env) ->
       .then( (success) =>
         return plugin.client.mobileDevices(plugin.home.id)
         .then( (mobileDevices) =>
-          env.logger.info("mobileDevices received: #{JSON.stringify(mobileDevices)}")
+          if @config.debug
+            env.logger.debug("mobileDevices received: #{JSON.stringify(mobileDevices)}")
           for mobileDevice in mobileDevices
             if mobileDevice.id == @deviceId
               @_presence =  mobileDevice.location.atHome
