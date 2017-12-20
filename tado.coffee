@@ -80,7 +80,6 @@ module.exports = (env) ->
                 }
                 @framework.deviceManager.discoveredDevice(
                   'pimatic-tado', 'ZoneClimate: ' + config.name, config
-              )
             Promise.resolve(zones)
           )
         ).then ( (success) =>
@@ -99,7 +98,6 @@ module.exports = (env) ->
                 }
                 @framework.deviceManager.discoveredDevice(
                   'pimatic-tado', 'tadoPresence: ' + config.name, config
-              )
             Promise.resolve(mobileDevices)
           )
         ).catch ( (err) =>
