@@ -43,7 +43,7 @@ module.exports = (env) ->
             Promise.resolve(home_info)
           )
         ).catch((err) ->
-          env.logger.error("Could not connect to tado web interface: ", (err.description || err))
+          env.logger.error("Could not connect to tado web interface: ", (err.error_description || err))
           Promise.reject(err)
         )
     
@@ -102,7 +102,7 @@ module.exports = (env) ->
             Promise.resolve(mobileDevices)
           )
         ).catch ( (err) =>
-          env.logger.error(err.description || err)
+          env.logger.error(err.error_description || err)
         )
       )     
                 
@@ -159,7 +159,7 @@ module.exports = (env) ->
           Promise.resolve(state)
         )        
       ).catch( (err) =>
-        env.logger.error(err.description || err)
+        env.logger.error(err.error_description || err)
         if @config.debug
           env.logger.debug("homeId=:" + plugin.home.id)
         Promise.reject(err)
