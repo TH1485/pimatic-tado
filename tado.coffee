@@ -82,6 +82,8 @@ module.exports = (env) ->
                   'pimatic-tado', 'ZoneClimate: ' + config.name, config
               )
             Promise.resolve(zones)
+          ).catch ( (err) =>
+            env.logger.error(err.error_description || err)
           )
         ).then ( (success) =>
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
