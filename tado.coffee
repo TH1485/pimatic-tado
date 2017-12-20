@@ -83,31 +83,10 @@ module.exports = (env) ->
                   'pimatic-tado', 'TadoClimate: ' + config.name, config)
             Promise.resolve(true)
           )
-        ).then ( (success) =>
-          #@framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
-          return @client.mobileDevices(@home.id).then( (mobileDevices) =>
-            env.logger.info("devices received: #{JSON.stringify(mobileDevices)}")
-            id = null
-            for mobileDevice in mobileDevices
-              env.logger.info("mobile device: #{JSON.stringify(mobileDevice)}")
-              if mobileDevice.settings.geoTrackingEnabled
-                id = @base.generateDeviceId @framework, mobileDevice.name, id
-                config = {
-                  class: 'TadoPresence'
-                  id: id
-                  deviceId: mobileDevice.id
-                  name: mobileDevice.name
-                  interval: 120000
-                }
-                @framework.deviceManager.discoveredDevice(
-                  'pimatic-tado', 'TadoPresence: ' + config.name, config)
-            Promise.resolve(mobileDevices)
-          )
         ).catch ( (err) =>
           env.logger.error(err.error_description || err)
         )
-      )     
-                
+      )
     
     setHome: (home) ->
       if home?
