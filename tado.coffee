@@ -21,10 +21,16 @@ module.exports = (env) ->
       @loginPromise =
         retry(() => @client.login(@config.loginname, @config.password),
         {
+          throw_original: true
           max_tries: 10
           interval: 100
           backoff: 2
-          predicate: ( (err) -> return JSON.parse(err.failure).error != "invalid_grant") 
+          predicate: ( (err) -> 
+                      try
+                        return JSON.parse(err.failure).error != "invalid_grant"
+                      catch
+                        return true
+                     )
         }
         ).then((connected) =>
           env.logger.info("Login established, connected with tado web interface")
@@ -37,7 +43,7 @@ module.exports = (env) ->
           )
         ).catch((err) ->
           env.logger.error("Could not connect to tado web interface", err)
-          if err.response? 
+          if err.failure? 
             env.logger.error("statusCode:"+ err.response.statusCode)
           Promise.reject(err)
         )
