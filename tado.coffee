@@ -43,7 +43,7 @@ module.exports = (env) ->
             Promise.resolve(home_info)
           )
         ).catch((err) ->
-          env.logger.error("Could not connect to tado web interface", (err.error || err))
+          env.logger.error("Could not connect to tado web interface: ", (err.description || err))
           Promise.reject(err)
         )
     
@@ -53,6 +53,13 @@ module.exports = (env) ->
         configDef: deviceConfigDef.ZoneClimate,
         createCallback: (config, lastState) ->
           device = new ZoneClimate(config, lastState)
+          return device
+      })
+      
+      @framework.deviceManager.registerDeviceClass("tadoPresence", {
+        configDef: deviceConfigDef.tadoPresence,
+        createCallback: (config, lastState) ->
+          device = new tadoPresence(config, lastState)
           return device
       })
       
@@ -111,15 +118,15 @@ module.exports = (env) ->
       @lastState = null
       super()
 
-      @requestValue()
-      @requestValueIntervalId =
-        setInterval( ( => @requestValue() ), @config.interval)
+      @requestClimate()
+      @requestClimateIntervalId =
+        setInterval( ( => @requestClimate() ), @config.interval)
 
     destroy: () ->
-      clearInterval @requestValueIntervalId if @requestValueIntervalId?
+      clearInterval @requestClimateIntervalId if @requestClimateIntervalId?
       super()
 
-    requestValue: ->
+    requestClimate: ->
       #if plugin.home?.id
       plugin.loginPromise
       .then( (success) =>
@@ -134,7 +141,7 @@ module.exports = (env) ->
           Promise.resolve(state)
         )        
       ).catch( (err) =>
-        env.logger.error(err)
+        env.logger.error(err.description || err)
         if @config.debug
           env.logger.debug("homeId=:" + plugin.home.id)
         Promise.reject(err)
@@ -143,5 +150,61 @@ module.exports = (env) ->
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
-  
+  class tadoPresence extends env.devices.PresenceSensor 
+    _presence: undefined
+    _relativeDistance: null
+
+    attributes:
+      presence:
+        description: "Presence of the human/device"
+        type: t.boolean
+        labels: ['present', 'absent']
+      relativeDistance:
+        description: "Relative distance of human/device from home"
+        type: "number"
+        unit: '%'
+    
+    constructor: (@config, lastState) ->
+      @name = @config.name
+      @id = @config.id
+      @deviceId = @config.deviceId
+      @_presence = lastState?.presence?.value or false
+      @_relativeDistance = lastState?.relativeDistance?.value
+      @lastState = null
+      super()
+      
+      @requestPresence()
+      @requestPresenceIntervalId =
+        setInterval( ( => @requestPresence() ), @config.interval)
+
+    destroy: () ->
+      clearInterval @requestPresenceIntervalId if @requestPresenceIntervalId?
+      super()
+
+    requestPresence: ->
+      #if plugin.home?.id
+      plugin.loginPromise
+      .then( (success) =>
+        return plugin.client.mobileDevices(plugin.home.id)
+        .then( (mobileDevices) =>
+          if @config.debug
+            env.logger.info("mobileDevices received: #{JSON.stringify(mobileDevices)}")
+          for mobileDevice in mobileDevices
+            if mobileDevice.id == @deviceId
+              @_presence =  mobileDevice.location.atHome
+              @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence
+              @emit "temperature", @_presence
+              @emit "relativeDistance", @_relativeDistance
+          Promise.resolve(mobileDevices)
+        )        
+      ).catch( (err) =>
+        env.logger.error(err)
+        if @config.debug
+          env.logger.debug("homeId=:" + plugin.home.id)
+        Promise.reject(err)
+      )
+     
+    getPresence: -> Promise.resolve(@_presence)
+    getRelativeDistance: -> Promise.resolve(@_relativeDistance)
+    
   return plugin
