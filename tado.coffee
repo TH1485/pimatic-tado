@@ -27,7 +27,8 @@ module.exports = (env) ->
           backoff: 2
           predicate: ( (err) -> 
                       try
-                        return JSON.parse(err.failure).error != "invalid_grant"
+                        env.logger.info("test",err)
+                        return err.error != "invalid_grant"
                       catch
                         return true
                      )
