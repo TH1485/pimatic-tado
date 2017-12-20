@@ -44,7 +44,7 @@ module.exports = (env) ->
         ).catch((err) ->
           env.logger.error("Could not connect to tado web interface", err)
           if err.failure? 
-            env.logger.error("statusCode:"+ err.failure.)
+            env.logger.error("statusCode:"+ err.failure.error)
           Promise.reject(err)
         )
     
@@ -109,6 +109,7 @@ module.exports = (env) ->
       @zone = @config.zone
       @_temperature = lastState?.temperature?.value
       @_humidity = lastState?.humidity?.value
+      @lastState = null
       super()
 
       @requestValue()
