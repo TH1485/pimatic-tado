@@ -10,7 +10,21 @@ module.exports = {
         type: "integer"
         default: 1
       interval:
-        description: "Interval in ms to interace with Tado web, the minimal reading interval should be 60000 (1 min)"
+        description: "Interval in ms to interace with Tado web, the minimal reading interval should be 120000 (2 min)"
+        type: "integer"
+        default: 120000
+    }
+  tadoPresence: {
+    title: "tadoPresence config options"
+    type: "object"
+    extensions: ["xLink", "xAttributeOptions"]
+    properties:
+      deviceId:
+        description: "Tado ID of the mobile device"
+        type: "integer"
+        default: 1
+      interval:
+        description: "Interval in ms to interace with Tado web, the minimal reading interval should be 120000 (2 min)"
         type: "integer"
         default: 120000
     }
