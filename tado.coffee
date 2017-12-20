@@ -65,8 +65,8 @@ module.exports = (env) ->
       
       @framework.deviceManager.on('discover', () =>
         @loginPromise.then( (success) =>
-          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
-          return @client.zones(@home.id).then( (zones) =>
+          return @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
+          @client.zones(@home.id).then( (zones) =>
             id = null
             for zone in zones
               if zone.type = "HEATING" and zone.name != "Hot Water"
@@ -82,8 +82,6 @@ module.exports = (env) ->
                   'pimatic-tado', 'ZoneClimate: ' + config.name, config
               )
             Promise.resolve(zones)
-          ).catch ( (err) =>
-            env.logger.error(err.error_description || err)
           )
         ).then ( (success) =>
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
@@ -207,8 +205,7 @@ module.exports = (env) ->
       .then( (success) =>
         return plugin.client.mobileDevices(plugin.home.id)
         .then( (mobileDevices) =>
-          if @config.debug
-            env.logger.info("mobileDevices received: #{JSON.stringify(mobileDevices)}")
+          env.logger.info("mobileDevices received: #{JSON.stringify(mobileDevices)}")
           for mobileDevice in mobileDevices
             if mobileDevice.id == @deviceId
               @_presence =  mobileDevice.location.atHome
