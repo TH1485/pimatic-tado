@@ -64,6 +64,7 @@ module.exports = (env) ->
       })
       
       @framework.deviceManager.on('discover', () =>
+        #climate devices
         @loginPromise.then( (success) =>
           @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
           return @client.zones(@home.id).then( (zones) =>
@@ -82,7 +83,11 @@ module.exports = (env) ->
                   'pimatic-tado', 'ZoneClimate: ' + config.name, config)
             Promise.resolve(zones)
           )
-        ).then ( (success) =>
+        ).catch ( (err) =>
+          env.logger.error(err.error_description || err)
+        )
+        #presence devices
+        @loginPromise.then ( (success) =>
           @framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
             id = null
