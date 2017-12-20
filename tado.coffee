@@ -85,6 +85,7 @@ module.exports = (env) ->
           , (err) =>
             env.logger.error(err.error_description || err)
             Promise.reject(err)
+          )          
         ).then ( (success) =>   
           @client.mobileDevices(@home.id).then( (mobileDevices) =>
             id = null
@@ -104,6 +105,7 @@ module.exports = (env) ->
           , (err) =>
             env.logger.error(err.error_description || err)
             Promise.reject(err)
+          )
         ).catch ( (err) =>
           env.logger.error(err.error_description || err)
         )
