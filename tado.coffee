@@ -83,8 +83,26 @@ module.exports = (env) ->
               )
             Promise.resolve(zones)
           )
+        ).then ( (success) =>
+          return @client.mobileDevices(@home.id).then( (mobileDevices) =>
+            id = null
+            for mobileDevice in mobileDevices
+              if mobileDevice.settings.geoTrackingEnabled
+                id = @base.generateDeviceId @framework, mobileDevice.name, id
+                config = {
+                  class: 'tadoPresence'
+                  id: id
+                  deviceId: mobileDevice.id
+                  name: mobileDevice.name
+                  interval: 120000
+                }
+                @framework.deviceManager.discoveredDevice(
+                  'pimatic-tado', 'tadoPresence: ' + config.name, config
+              )
+            Promise.resolve(mobileDevices)
+          )
         ).catch ( (err) =>
-          env.logger.error(err)
+          env.logger.error(err.description || err)
         )
       )     
                 
