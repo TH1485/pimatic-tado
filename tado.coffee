@@ -37,6 +37,8 @@ module.exports = (env) ->
           )
         ).catch((err) ->
           env.logger.error("Could not connect to tado web interface", err)
+          if err.response? 
+            env.logger.error("statusCode:"+ err.response.statusCode)
           Promise.reject(err)
         )
     
