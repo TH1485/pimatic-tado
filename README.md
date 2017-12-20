@@ -30,12 +30,24 @@ Add the plugin to the plugin section:
 }
 ```
 add manual to device section or use discover devices in the pimatic web interface!
+
+TadoClimate device:
 ```json
 {
   "id": "mylivingroom",
   "name": "My Living Room",
-  "class": "ZoneClimate",
+  "class": "TadoClimate",
   "zone": 1,
+  "interval": 120000
+ }
+```
+TadoPresence device:
+```json
+{
+  "id": "myphone",
+  "name": "myPhone",
+  "class": "TadoPresence",
+  "id": 1234,
   "interval": 120000
  }
 ```
