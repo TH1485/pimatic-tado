@@ -83,6 +83,8 @@ module.exports = (env) ->
                   'pimatic-tado', 'TadoClimate: ' + config.name, config)
             Promise.resolve(true)
           )
+        ).then ( (success) =>
+          env.logger.info("test")
         ).catch ( (err) =>
           env.logger.error(err.error_description || err)
         )
