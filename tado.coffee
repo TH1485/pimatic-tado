@@ -213,7 +213,7 @@ module.exports = (env) ->
             if mobileDevice.id == @deviceId
               @_presence =  mobileDevice.location.atHome
               @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence * 100
-              @emit "temperature", @_presence
+              @emit "presence", @_presence
               @emit "relativeDistance", @_relativeDistance
           Promise.resolve(mobileDevices)
         )        
