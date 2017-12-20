@@ -52,7 +52,7 @@ module.exports = (env) ->
       })
       
       @framework.deviceManager.on('discover', () =>
-        return @loginPromise.then( (success) =>
+        @loginPromise.then( (success) =>
           @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
           return @client.zones(@home.id).then( (zones) =>
             id = null
