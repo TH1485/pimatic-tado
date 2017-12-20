@@ -23,11 +23,11 @@ module.exports = (env) ->
         {
           throw_original: true
           max_tries: 10
-          interval: 100
+          interval: 1000
           backoff: 2
           predicate: ( (err) -> 
                       try
-                        env.logger.info("test",err)
+                        env.logger.info(err.Error || err)
                         return err.error != "invalid_grant"
                       catch
                         return true
@@ -43,9 +43,7 @@ module.exports = (env) ->
             Promise.resolve(home_info)
           )
         ).catch((err) ->
-          env.logger.error("Could not connect to tado web interface", err)
-          if err.failure? 
-            env.logger.error("statusCode:"+ err.failure.error)
+          env.logger.error("Could not connect to tado web interface", (err.error || err))
           Promise.reject(err)
         )
     
