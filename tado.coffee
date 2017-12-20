@@ -49,17 +49,17 @@ module.exports = (env) ->
     
       deviceConfigDef = require("./device-config-schema")
 
-      @framework.deviceManager.registerDeviceClass("ZoneClimate", {
-        configDef: deviceConfigDef.ZoneClimate,
+      @framework.deviceManager.registerDeviceClass("TadoClimate", {
+        configDef: deviceConfigDef.TadoClimate,
         createCallback: (config, lastState) ->
-          device = new ZoneClimate(config, lastState)
+          device = new TadoClimate(config, lastState)
           return device
       })
       
-      @framework.deviceManager.registerDeviceClass("tadoPresence", {
-        configDef: deviceConfigDef.tadoPresence,
+      @framework.deviceManager.registerDeviceClass("TadoPresence", {
+        configDef: deviceConfigDef.TadoPresence,
         createCallback: (config, lastState) ->
-          device = new tadoPresence(config, lastState)
+          device = new TadoPresence(config, lastState)
           return device
       })
       
@@ -73,14 +73,14 @@ module.exports = (env) ->
               if zone.type = "HEATING" and zone.name != "Hot Water"
                 id = @base.generateDeviceId @framework, zone.name, id
                 config = {
-                  class: 'ZoneClimate'
+                  class: 'TadoClimate'
                   id: id
                   zone: zone.id
                   name: zone.name
                   interval: 120000
                 }
                 @framework.deviceManager.discoveredDevice(
-                  'pimatic-tado', 'ZoneClimate: ' + config.name, config)
+                  'pimatic-tado', 'TadoClimate: ' + config.name, config)
             Promise.resolve(zones)
           )
         ).catch ( (err) =>
@@ -95,14 +95,14 @@ module.exports = (env) ->
               if mobileDevice.settings.geoTrackingEnabled
                 id = @base.generateDeviceId @framework, mobileDevice.name, id
                 config = {
-                  class: 'tadoPresence'
+                  class: 'TadoPresence'
                   id: id
                   deviceId: mobileDevice.id
                   name: mobileDevice.name
                   interval: 120000
                 }
                 @framework.deviceManager.discoveredDevice(
-                  'pimatic-tado', 'tadoPresence: ' + config.name, config)
+                  'pimatic-tado', 'TadoPresence: ' + config.name, config)
             Promise.resolve(mobileDevices)
           )
         ).catch ( (err) =>
@@ -117,7 +117,7 @@ module.exports = (env) ->
        
   plugin = new TadoPlugin
 
-  class ZoneClimate extends env.devices.TemperatureSensor
+  class TadoClimate extends env.devices.TemperatureSensor
     _temperature: null
     _humidity: null
 
@@ -172,7 +172,7 @@ module.exports = (env) ->
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
-  class tadoPresence extends env.devices.PresenceSensor 
+  class TadoPresence extends env.devices.PresenceSensor 
     _presence: undefined
     _relativeDistance: null
 
