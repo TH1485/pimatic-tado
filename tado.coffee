@@ -65,8 +65,8 @@ module.exports = (env) ->
       
       @framework.deviceManager.on('discover', () =>
         @loginPromise.then( (success) =>
-          return @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
-          @client.zones(@home.id).then( (zones) =>
+          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
+          return @client.zones(@home.id).then( (zones) =>
             id = null
             for zone in zones
               if zone.type = "HEATING" and zone.name != "Hot Water"
@@ -84,6 +84,7 @@ module.exports = (env) ->
             Promise.resolve(zones)
           )
         ).then ( (success) =>
+          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
             id = null
             for mobileDevice in mobileDevices
