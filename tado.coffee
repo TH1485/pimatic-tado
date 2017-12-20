@@ -15,7 +15,7 @@ module.exports = (env) ->
     init: (app, @framework, @config) =>
       
       @base = commons.base @, 'TadoPlugin'
-      @client = new tadoClient
+      @client = new TadoClient
       
       #connecting to tado web interface and acquiring home id
       @loginPromise =
