@@ -24,7 +24,7 @@ module.exports = (env) ->
           max_tries: 10
           interval: 100
           backoff: 2
-          predicate: ( (err) -> return err.error != "invalid_grant") 
+          predicate: ( (err) -> return JSON.parse(err.failure).error != "invalid_grant") 
         }
         ).then((connected) =>
           env.logger.info("Login established, connected with tado web interface")
