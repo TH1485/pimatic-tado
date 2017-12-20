@@ -175,7 +175,7 @@ module.exports = (env) ->
     attributes:
       presence:
         description: "Presence of the human/device"
-        type: t.boolean
+        type: "boolean"
         labels: ['present', 'absent']
       relativeDistance:
         description: "Relative distance of human/device from home"
