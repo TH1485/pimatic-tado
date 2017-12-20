@@ -96,4 +96,7 @@ module.exports = (env) ->
     state:(homeId, zoneId) ->
       return this.api("/homes/#{homeId}/zones/#{zoneId}/state")
 
+    mobileDevices:(homeId) ->
+      return this.api("/homes/#{homeId}/mobileDevices")
+
   return Client
