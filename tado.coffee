@@ -67,7 +67,7 @@ module.exports = (env) ->
         #climate devices
         @loginPromise.then( (success) =>
           @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
-          return @client.zones(@home.id).then( (zones) =>
+          @client.zones(@home.id).then( (zones) =>
             id = null
             for zone in zones
               if zone.type = "HEATING" and zone.name != "Hot Water"
@@ -82,9 +82,28 @@ module.exports = (env) ->
                 @framework.deviceManager.discoveredDevice(
                   'pimatic-tado', 'TadoClimate: ' + config.name, config)
             Promise.resolve(true)
-          )
-        ).then ( (success) =>
-          env.logger.info("test")
+          , (err) =>
+            env.logger.error(err.error_description || err)
+            Promise.reject(err)
+        ).then ( (success) =>   
+          @client.mobileDevices(@home.id).then( (mobileDevices) =>
+            id = null
+            for mobileDevice in mobileDevices
+              if mobileDevice.settings.geoTrackingEnabled
+                id = @base.generateDeviceId @framework, mobileDevice.name, id
+                config = {
+                  class: 'TadoPresence'
+                  id: id
+                  deviceId: mobileDevice.id
+                  name: mobileDevice.name
+                  interval: 120000
+                }
+                @framework.deviceManager.discoveredDevice(
+                  'pimatic-tado', 'TadoClimate: ' + config.name, config)
+            Promise.resolve(true)
+          , (err) =>
+            env.logger.error(err.error_description || err)
+            Promise.reject(err)
         ).catch ( (err) =>
           env.logger.error(err.error_description || err)
         )
