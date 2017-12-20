@@ -86,8 +86,10 @@ module.exports = (env) ->
         ).then ( (success) =>
           #@framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
+            env.logger.info("devices received: #{JSON.stringify(mobileDevices)}")
             id = null
             for mobileDevice in mobileDevices
+              env.logger.info("mobile device: #{JSON.stringify(mobileDevice)}")
               if mobileDevice.settings.geoTrackingEnabled
                 id = @base.generateDeviceId @framework, mobileDevice.name, id
                 config = {
