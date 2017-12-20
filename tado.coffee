@@ -81,13 +81,9 @@ module.exports = (env) ->
                 }
                 @framework.deviceManager.discoveredDevice(
                   'pimatic-tado', 'TadoClimate: ' + config.name, config)
-            Promise.resolve(zones)
+            Promise.resolve(true)
           )
-        ).catch ( (err) =>
-          env.logger.error(err.error_description || err)
-        )
-        #presence devices
-        @loginPromise.then ( (success) =>
+        ).then ( (success) =>
           #@framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
             id = null
