@@ -88,7 +88,7 @@ module.exports = (env) ->
         )
         #presence devices
         @loginPromise.then ( (success) =>
-          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
+          #@framework.deviceManager.discoverMessage("pimatic-tado", "discovering mobileDevices..")
           return @client.mobileDevices(@home.id).then( (mobileDevices) =>
             id = null
             for mobileDevice in mobileDevices
