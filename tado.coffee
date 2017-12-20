@@ -65,9 +65,11 @@ module.exports = (env) ->
       
       @framework.deviceManager.on('discover', () =>
         #climate devices
-        @loginPromise.then( (success) =>
+        @loginPromise
+        .then (success) =>
           @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
-          @client.zones(@home.id).then( (zones) =>
+          return @client.zones(@home.id)
+          .then (zones) =>
             id = null
             for zone in zones
               if zone.type = "HEATING" and zone.name != "Hot Water"
@@ -85,9 +87,9 @@ module.exports = (env) ->
           , (err) =>
             env.logger.error(err.error_description || err)
             Promise.reject(err)
-          )          
-        ).then ( (success) =>   
-          @client.mobileDevices(@home.id).then( (mobileDevices) =>
+        .then (success) =>   
+          @client.mobileDevices(@home.id)
+          .then (mobileDevices) =>
             id = null
             for mobileDevice in mobileDevices
               if mobileDevice.settings.geoTrackingEnabled
@@ -105,10 +107,6 @@ module.exports = (env) ->
           , (err) =>
             env.logger.error(err.error_description || err)
             Promise.reject(err)
-          )
-        ).catch ( (err) =>
-          env.logger.error(err.error_description || err)
-        )
       )
     
     setHome: (home) ->
