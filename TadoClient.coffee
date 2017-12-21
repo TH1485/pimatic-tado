@@ -13,7 +13,7 @@ module.exports = (env) ->
     constructor: () ->
 
     login:(username,password) ->
-      return new Promise(resolve, reject) =>
+      return new Promise( (resolve, reject) =>
         request.post(
           url: AUTH_URL + '/oauth/token'
           qs:
@@ -72,7 +72,7 @@ module.exports = (env) ->
               referer: REFERER
             auth:
               bearer: this.token.access_token
-          , (err, response, result) =>
+          , (err, response, result) ->
             if (err || response.statusCode != 200)
               reject(err || result)
             else
