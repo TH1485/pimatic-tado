@@ -13,7 +13,7 @@ module.exports = (env) ->
     constructor: () ->
 
     login:(username,password) ->
-      return new Promise((resolve, reject) =>
+      return new Promise(resolve, reject) =>
         request.post(
           url: AUTH_URL + '/oauth/token'
           qs:
