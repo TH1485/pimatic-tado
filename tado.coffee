@@ -53,14 +53,14 @@ module.exports = (env) ->
           device = new TadoClimate(config, lastState)
           return device
       })
-   
+
       @framework.deviceManager.registerDeviceClass("TadoPresence", {
         configDef: deviceConfigDef.TadoPresence,
         createCallback: (config, lastState) ->
           device = new TadoPresence(config, lastState)
           return device
       })
- 
+
       @framework.deviceManager.on 'discover', () =>
         #climate devices
         @loginPromise
@@ -220,5 +220,5 @@ module.exports = (env) ->
 
     getPresence: -> Promise.resolve(@_presence)
     getRelativeDistance: -> Promise.resolve(@_relativeDistance)
- 
+
   return plugin
