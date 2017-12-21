@@ -19,7 +19,7 @@
   "configSchema": "tado-config-schema.coffee",
   "dependencies": {
     "bluebird-retry": "^0.11.0",
-    "pimatic-plugin-commons": "^0.9.3",
+    "pimatic-plugin-commons": "^0.9.3"
   },
    "peerDependencies": {
   },
