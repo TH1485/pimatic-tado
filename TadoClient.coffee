@@ -36,7 +36,7 @@ module.exports = (env) ->
     saveToken:(token) ->
       this.token = token
       this.token.expires_in =
-        moment().add(token.expires_in /2, 'seconds').toDate()
+        moment().add(token.expires_in - 30, 'seconds').toDate()
 
     refreshToken:() ->
       return new Promise((resolve, reject) =>
