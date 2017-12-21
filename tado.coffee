@@ -43,7 +43,7 @@ module.exports = (env) ->
             Promise.resolve(home_info)
           )
         ).catch((err) ->
-          env.logger.error("Could not connect to tado web interface: ", (err.error_description || err))
+          env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
           Promise.reject(err)
         )
     
@@ -63,24 +63,24 @@ module.exports = (env) ->
           return device
       })
       
-      @framework.deviceManager.on('discover', () =>
+      @framework.deviceManager.on 'discover', () =>
         #climate devices
         @loginPromise
         .then (success) =>
-          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering zones..")
+          @framework.deviceManager.discoverMessage("pimatic-tado", "discovering devices..")
           return @client.zones(@home.id)
           .then (zones) =>
             id = null
             for zone in zones
-              if zone.type = "HEATING" and zone.name != "Hot Water"
-                id = @base.generateDeviceId @framework, zone.name, id
-                config = {
+              if zone.type = 'HEATING' and zone.name != 'Hot Water'
+                id = @base.generateDeviceId @framework, zone.name.toLowerCase(), id
+                id = id.toLowerCase().replace(/\s/g,'')
+                config =
                   class: 'TadoClimate'
                   id: id
                   zone: zone.id
                   name: zone.name
                   interval: 120000
-                }
                 @framework.deviceManager.discoveredDevice(
                   'TadoClimate', config.name, config)
             Promise.resolve(true)
@@ -88,26 +88,26 @@ module.exports = (env) ->
             env.logger.error(err.error_description || err)
             Promise.reject(err)
         .then (success) =>   
-          @client.mobileDevices(@home.id)
+          return @client.mobileDevices(@home.id)
           .then (mobileDevices) =>
             id = null
             for mobileDevice in mobileDevices
               if mobileDevice.settings.geoTrackingEnabled
                 id = @base.generateDeviceId @framework, mobileDevice.name, id
-                config = {
+                id = id.toLowerCase().replace(/\s/g,'')
+                config = 
                   class: 'TadoPresence'
                   id: id
                   deviceId: mobileDevice.id
                   name: mobileDevice.name
                   interval: 120000
-                }
                 @framework.deviceManager.discoveredDevice(
                   'TadoPresence', config.name, config)
             Promise.resolve(true)
           , (err) =>
             env.logger.error(err.error_description || err)
             Promise.reject(err)
-      )
+
     
     setHome: (home) ->
       if home?
@@ -149,9 +149,9 @@ module.exports = (env) ->
     requestClimate: ->
       #if plugin.home?.id
       plugin.loginPromise
-      .then( (success) =>
+      .then (success) =>
         return plugin.client.state(plugin.home.id, @zone)
-        .then( (state) =>
+        .then (state) =>
           if @config.debug
             env.logger.debug("state received: #{JSON.stringify(state)}")
           @_temperature = state.sensorDataPoints.insideTemperature.celsius
@@ -159,14 +159,12 @@ module.exports = (env) ->
           @emit "temperature", @_temperature
           @emit "humidity", @_humidity
           Promise.resolve(state)
-        )        
-      ).catch( (err) =>
+      .catch (err) =>
         env.logger.error(err.error_description || err)
         if @config.debug
           env.logger.debug("homeId=:" + plugin.home.id)
         Promise.reject(err)
-      )
-     
+           
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
@@ -204,9 +202,9 @@ module.exports = (env) ->
     requestPresence: ->
       #if plugin.home?.id
       plugin.loginPromise
-      .then( (success) =>
+      .then (success) =>
         return plugin.client.mobileDevices(plugin.home.id)
-        .then( (mobileDevices) =>
+        .then (mobileDevices) =>
           if @config.debug
             env.logger.debug("mobileDevices received: #{JSON.stringify(mobileDevices)}")
           for mobileDevice in mobileDevices
@@ -216,13 +214,12 @@ module.exports = (env) ->
               @emit "presence", @_presence
               @emit "relativeDistance", @_relativeDistance
           Promise.resolve(mobileDevices)
-        )        
-      ).catch( (err) =>
+      .catch (err) =>
         env.logger.error(err)
         if @config.debug
-          env.logger.debug("homeId=:" + plugin.home.id)
+          env.logger.debug("homeId= #{plugin.home.id}")
         Promise.reject(err)
-      )
+  
      
     getPresence: -> Promise.resolve(@_presence)
     getRelativeDistance: -> Promise.resolve(@_relativeDistance)
