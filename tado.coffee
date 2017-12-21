@@ -6,47 +6,45 @@ module.exports = (env) ->
   assert = env.require 'cassert'
   #require tado client
   retry = require 'bluebird-retry'
-  commons = require('pimatic-plugin-commons')(env) 
-  TadoClient = require('./TadoClient.coffee')(env) 
-  #tadoClient = require './TadoClient.coffee'  
-  
+  commons = require('pimatic-plugin-commons')(env)
+  TadoClient = require('./TadoClient.coffee')(env)
+  #tadoClient = require './TadoClient.coffee'
+
   class TadoPlugin extends env.plugins.Plugin
 
     init: (app, @framework, @config) =>
       
       @base = commons.base @, 'TadoPlugin'
       @client = new TadoClient
-      
+
       #connecting to tado web interface and acquiring home id
       @loginPromise =
-        retry(() => @client.login(@config.loginname, @config.password),
+        retry( () => @client.login(@config.loginname, @config.password),
         {
-          throw_original: true
-          max_tries: 10
-          interval: 1000
-          backoff: 2
-          predicate: ( (err) -> 
-                      try
-                        env.logger.info(err.error || err)
-                        return err.error != "invalid_grant"
-                      catch
-                        return true
-                     )
+        throw_original: true
+        max_tries: 10
+        interval: 1000
+        backoff: 2
+        predicate: (err) ->
+          try
+            if @config.debug
+              env.logger.debug(err.error || err)
+            return err.error != "invalid_grant"
+          catch
+            return true
         }
-        ).then((connected) =>
+        ).then (connected) =>
           env.logger.info("Login established, connected with tado web interface")
-          return @client.me().then( (home_info) =>
+          return @client.me().then (home_info) =>
             env.logger.info("Connect to #{home_info.homes[0].name} with id: #{home_info.homes[0].id}")
             if @config.debug
               env.logger.debug(JSON.stringify(home_info))
             @setHome(home_info.homes[0])
-            Promise.resolve(home_info)
-          )
-        ).catch((err) ->
+            Promise.resolve true
+        .catch (err) ->
           env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
-          Promise.reject(err)
-        )
-    
+          Promise.reject err
+
       deviceConfigDef = require("./device-config-schema")
 
       @framework.deviceManager.registerDeviceClass("TadoClimate", {
@@ -55,14 +53,14 @@ module.exports = (env) ->
           device = new TadoClimate(config, lastState)
           return device
       })
-      
+   
       @framework.deviceManager.registerDeviceClass("TadoPresence", {
         configDef: deviceConfigDef.TadoPresence,
         createCallback: (config, lastState) ->
           device = new TadoPresence(config, lastState)
           return device
       })
-      
+ 
       @framework.deviceManager.on 'discover', () =>
         #climate devices
         @loginPromise
@@ -84,10 +82,10 @@ module.exports = (env) ->
                 @framework.deviceManager.discoveredDevice(
                   'TadoClimate', config.name, config)
             Promise.resolve(true)
-          , (err) =>
+          , (err) ->
             env.logger.error(err.error_description || err)
             Promise.reject(err)
-        .then (success) =>   
+        .then (success) =>
           return @client.mobileDevices(@home.id)
           .then (mobileDevices) =>
             id = null
@@ -95,7 +93,7 @@ module.exports = (env) ->
               if mobileDevice.settings.geoTrackingEnabled
                 id = @base.generateDeviceId @framework, mobileDevice.name, id
                 id = id.toLowerCase().replace(/\s/g,'')
-                config = 
+                config =
                   class: 'TadoPresence'
                   id: id
                   deviceId: mobileDevice.id
@@ -104,7 +102,7 @@ module.exports = (env) ->
                 @framework.deviceManager.discoveredDevice(
                   'TadoPresence', config.name, config)
             Promise.resolve(true)
-          , (err) =>
+          , (err) ->
             env.logger.error(err.error_description || err)
             Promise.reject(err)
 
@@ -112,7 +110,7 @@ module.exports = (env) ->
     setHome: (home) ->
       if home?
         @home = home
-       
+
   plugin = new TadoPlugin
 
   class TadoClimate extends env.devices.TemperatureSensor
@@ -168,7 +166,7 @@ module.exports = (env) ->
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
 
-  class TadoPresence extends env.devices.PresenceSensor 
+  class TadoPresence extends env.devices.PresenceSensor
     _presence: undefined
     _relativeDistance: null
 
@@ -181,7 +179,7 @@ module.exports = (env) ->
         description: "Relative distance of human/device from home"
         type: "number"
         unit: '%'
-    
+
     constructor: (@config, lastState) ->
       @name = @config.name
       @id = @config.id
@@ -190,7 +188,7 @@ module.exports = (env) ->
       @_relativeDistance = lastState?.relativeDistance?.value
       @lastState = null
       super()
-      
+
       @requestPresence()
       @requestPresenceIntervalId =
         setInterval( ( => @requestPresence() ), @config.interval)
@@ -219,9 +217,8 @@ module.exports = (env) ->
         if @config.debug
           env.logger.debug("homeId= #{plugin.home.id}")
         Promise.reject(err)
-  
-     
+
     getPresence: -> Promise.resolve(@_presence)
     getRelativeDistance: -> Promise.resolve(@_relativeDistance)
-    
+ 
   return plugin
