@@ -219,7 +219,7 @@ module.exports = (env) ->
                 @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence * 100
                 @emit "presence", @_presence
                 @emit "relativeDistance", @_relativeDistance
-            Promise.resolve(mobilDevices)
+            Promise.resolve(mobileDevices)
         .catch (err) =>
           env.logger.error(err.error_description || err)
           if @config.debug
