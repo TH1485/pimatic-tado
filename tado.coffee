@@ -164,6 +164,8 @@ module.exports = (env) ->
           @emit "temperature", @_temperature
           @emit "humidity", @_humidity
           Promise.resolve(state)
+        , (err)  ->
+          throw err
       .catch (err) =>
         env.logger.error(err.error_description || err)
         if @config.debug
@@ -219,6 +221,8 @@ module.exports = (env) ->
               @emit "presence", @_presence
               @emit "relativeDistance", @_relativeDistance
           Promise.resolve(mobileDevices)
+        , (err)  ->
+          throw err
       .catch (err) =>
         env.logger.error(err.error_description || err)
         if @config.debug
