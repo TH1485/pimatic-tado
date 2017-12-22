@@ -150,7 +150,7 @@ module.exports = (env) ->
     requestClimate: ->
       if plugin.loginPromise? and plugin.home?.id?
         plugin.loginPromise
-        .then (success) =>
+        .then ( (success) =>
           return plugin.client.state(plugin.home.id, @zone)
           .then (state) =>
             if @config.debug
@@ -160,9 +160,7 @@ module.exports = (env) ->
             @emit "temperature", @_temperature
             @emit "humidity", @_humidity
             Promise.resolve(state)
-          , (err)  ->
-            Promise.reject(err)
-        .catch (err) =>
+        ).catch (err) =>
           env.logger.error(err.error_description || err)
           if @config.debug
             env.logger.debug("homeId=:" + plugin.home.id)
@@ -203,27 +201,25 @@ module.exports = (env) ->
       super()
 
     requestPresence: ->
-      #if plugin.home?.id
-      plugin.loginPromise
-      .then (success) =>
-        return plugin.client.mobileDevices(plugin.home.id)
-        .then (mobileDevices) =>
+      if plugin.loginPromise? and plugin.home?.id?
+        plugin.loginPromise
+        .then ( (success) =>
+          return plugin.client.mobileDevices(plugin.home.id)
+          .then (mobileDevices) =>
+            if @config.debug
+              env.logger.debug("mobileDevices received: #{JSON.stringify(mobileDevices)}")
+            for mobileDevice in mobileDevices
+              if mobileDevice.id == @deviceId
+                @_presence =  mobileDevice.location.atHome
+                @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence * 100
+                @emit "presence", @_presence
+                @emit "relativeDistance", @_relativeDistance
+            Promise.resolve(mobilDevices)
+        ).catch (err) =>
+          env.logger.error(err.error_description || err)
           if @config.debug
-            env.logger.debug("mobileDevices received: #{JSON.stringify(mobileDevices)}")
-          for mobileDevice in mobileDevices
-            if mobileDevice.id == @deviceId
-              @_presence =  mobileDevice.location.atHome
-              @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence * 100
-              @emit "presence", @_presence
-              @emit "relativeDistance", @_relativeDistance
-          Promise.resolve(mobileDevices)
-        , (err)  ->
+            env.logger.debug("homeId= #{plugin.home.id}")
           Promise.reject(err)
-      .catch (err) =>
-        env.logger.error(err.error_description || err)
-        if @config.debug
-          env.logger.debug("homeId= #{plugin.home.id}")
-        Promise.reject(err)
 
     getPresence: -> Promise.resolve(@_presence)
     getRelativeDistance: -> Promise.resolve(@_relativeDistance)
