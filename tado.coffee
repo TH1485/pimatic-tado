@@ -16,11 +16,7 @@ module.exports = (env) ->
       
       @base = commons.base @, 'TadoPlugin'
       @client = new TadoClient
-      @loginPromise = new Promise( (resolve,reject ) =>
-        @framework.on "server listen", =>
-          return resolve("Pimatic server started, initializing tado connection")
-      )
-        
+             
       # wait for pimatic to finish starting http(s) server
       @framework.on "server listen", =>
         env.logger.info("Pimatic server started, initializing tado connection") 
@@ -152,25 +148,25 @@ module.exports = (env) ->
       super()
 
     requestClimate: ->
-      #if plugin.home?.id
-      plugin.loginPromise
-      .then (success) =>
-        return plugin.client.state(plugin.home.id, @zone)
-        .then (state) =>
+      if plugin.loginPromise? and plugin.home?.id?
+        plugin.loginPromise
+        .then (success) =>
+          return plugin.client.state(plugin.home.id, @zone)
+          .then (state) =>
+            if @config.debug
+              env.logger.debug("state received: #{JSON.stringify(state)}")
+            @_temperature = state.sensorDataPoints.insideTemperature.celsius
+            @_humidity = state.sensorDataPoints.humidity.percentage
+            @emit "temperature", @_temperature
+            @emit "humidity", @_humidity
+            Promise.resolve(state)
+          , (err)  ->
+            Promise.reject(err)
+        .catch (err) =>
+          env.logger.error(err.error_description || err)
           if @config.debug
-            env.logger.debug("state received: #{JSON.stringify(state)}")
-          @_temperature = state.sensorDataPoints.insideTemperature.celsius
-          @_humidity = state.sensorDataPoints.humidity.percentage
-          @emit "temperature", @_temperature
-          @emit "humidity", @_humidity
-          Promise.resolve(state)
-        , (err)  ->
-          throw err
-      .catch (err) =>
-        env.logger.error(err.error_description || err)
-        if @config.debug
-          env.logger.debug("homeId=:" + plugin.home.id)
-        Promise.reject(err)
+            env.logger.debug("homeId=:" + plugin.home.id)
+          Promise.reject(err)
            
     getTemperature: -> Promise.resolve(@_temperature)
     getHumidity: -> Promise.resolve(@_humidity)
@@ -222,7 +218,7 @@ module.exports = (env) ->
               @emit "relativeDistance", @_relativeDistance
           Promise.resolve(mobileDevices)
         , (err)  ->
-          throw err
+          Promise.reject(err)
       .catch (err) =>
         env.logger.error(err.error_description || err)
         if @config.debug
