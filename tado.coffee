@@ -18,7 +18,7 @@ module.exports = (env) ->
       @client = new TadoClient
              
       # wait for pimatic to finish starting http(s) server
-      @framework.once "after init", =>
+      @framework.once "server listen", =>
         env.logger.info("Pimatic server started, initializing tado connection") 
         #connecting to tado web interface and acquiring home id  
         @loginPromise =
