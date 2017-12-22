@@ -18,35 +18,35 @@ module.exports = (env) ->
       @client = new TadoClient
              
       # wait for pimatic to finish starting http(s) server
-      @framework.on "server listen", =>
-        env.logger.info("Pimatic server started, initializing tado connection") 
+      #@framework.on "server listen", =>
+      #  env.logger.info("Pimatic server started, initializing tado connection") 
       #connecting to tado web interface and acquiring home id  
-        @loginPromise =
-          retry( () => @client.login(@config.loginname, @config.password),
-          {
-          throw_original: true
-          max_tries: 20
-          interval: 50
-          backoff: 2
-          predicate: (err) ->
-            try
-              if @config.debug
-                env.logger.debug(err.error || err)
-              return err.error != "invalid_grant"
-            catch
-              return true
-          }
-          ).then (connected) =>
-            env.logger.info("Login established, connected with tado web interface")
-            return @client.me().then (home_info) =>
-              env.logger.info("Connected to #{home_info.homes[0].name} with id: #{home_info.homes[0].id}")
-              if @config.debug
-                env.logger.debug(JSON.stringify(home_info))
-              @setHome(home_info.homes[0])
-              connected
-          .catch (err) ->
-            env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
-            Promise.reject err
+      @loginPromise =
+        retry( () => @client.login(@config.loginname, @config.password),
+        {
+        throw_original: true
+        max_tries: 20
+        interval: 50
+        backoff: 2
+        predicate: (err) ->
+          try
+            if @config.debug
+              env.logger.debug(err.error || err)
+            return err.error != "invalid_grant"
+          catch
+            return true
+        }
+        ).then (connected) =>
+          env.logger.info("Login established, connected with tado web interface")
+          return @client.me().then (home_info) =>
+            env.logger.info("Connected to #{home_info.homes[0].name} with id: #{home_info.homes[0].id}")
+            if @config.debug
+              env.logger.debug(JSON.stringify(home_info))
+            @setHome(home_info.homes[0])
+            connected
+        .catch (err) ->
+          env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
+          Promise.reject err
       #
       deviceConfigDef = require("./device-config-schema")
 
