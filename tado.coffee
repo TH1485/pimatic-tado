@@ -18,9 +18,9 @@ module.exports = (env) ->
       @client = new TadoClient
              
       # wait for pimatic to finish starting http(s) server
-      #@framework.on "server listen", =>
-      #  env.logger.info("Pimatic server started, initializing tado connection") 
-      #connecting to tado web interface and acquiring home id  
+      @framework.once "after init", =>
+        env.logger.info("Pimatic server started, initializing tado connection") 
+      connecting to tado web interface and acquiring home id  
       @loginPromise =
         retry( () => @client.login(@config.loginname, @config.password),
         {
@@ -53,14 +53,14 @@ module.exports = (env) ->
       @framework.deviceManager.registerDeviceClass("TadoClimate", {
         configDef: deviceConfigDef.TadoClimate,
         createCallback: (config, lastState) ->
-          device = new TadoClimate(config, lastState)
+          device = new TadoClimate(config, lastState,@framework)
           return device
       })
 
       @framework.deviceManager.registerDeviceClass("TadoPresence", {
         configDef: deviceConfigDef.TadoPresence,
         createCallback: (config, lastState) ->
-          device = new TadoPresence(config, lastState)
+          device = new TadoPresence(config, lastState,@framework)
           return device
       })
 
@@ -133,7 +133,7 @@ module.exports = (env) ->
         type: "number"
         unit: '%'
 
-    constructor: (@config, lastState) ->
+    constructor: (@config, lastState,@framework) ->
       @name = @config.name
       @id = @config.id
       @zone = @config.zone
@@ -142,9 +142,10 @@ module.exports = (env) ->
       @lastState = null
       super()
 
-      @requestClimate()
-      @requestClimateIntervalId =
-        setInterval( ( => @requestClimate() ), @config.interval)
+      @framework.once "after init", =>
+        @requestClimate()
+        @requestClimateIntervalId =
+          setInterval( ( => @requestClimate() ), @config.interval)
 
     destroy: () ->
       clearInterval @requestClimateIntervalId if @requestClimateIntervalId?
@@ -186,7 +187,7 @@ module.exports = (env) ->
         type: "number"
         unit: '%'
 
-    constructor: (@config, lastState) ->
+    constructor: (@config, lastState, @framework) ->
       @name = @config.name
       @id = @config.id
       @deviceId = @config.deviceId
@@ -194,10 +195,11 @@ module.exports = (env) ->
       @_relativeDistance = lastState?.relativeDistance?.value
       @lastState = null
       super()
-
-      @requestPresence()
-      @requestPresenceIntervalId =
-        setInterval( ( => @requestPresence() ), @config.interval)
+      
+      @framework.once "after init", =>
+        @requestPresence()
+        @requestPresenceIntervalId =
+          setInterval( ( => @requestPresence() ), @config.interval)
 
     destroy: () ->
       clearInterval @requestPresenceIntervalId if @requestPresenceIntervalId?
