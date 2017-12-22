@@ -22,8 +22,8 @@ module.exports = (env) ->
         retry( () => @client.login(@config.loginname, @config.password),
         {
         throw_original: true
-        max_tries: 10
-        interval: 1000
+        max_tries: 20
+        interval: 50
         backoff: 2
         predicate: (err) ->
           try
