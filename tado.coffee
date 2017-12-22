@@ -16,11 +16,12 @@ module.exports = (env) ->
       
       @base = commons.base @, 'TadoPlugin'
       @client = new TadoClient
-      @loginPromise = Promise.reject(true)
-      #connecting to tado web interface and acquiring home id
+      @loginPromise = Promise.reject("Server not started")
       
-      @framework.on "server listen", => 
-        
+      # wait for pimatic to finish starting http(s) server
+      @framework.on "server listen", =>
+        env.logger.info("Pimatic server started, initializing tado connection") 
+      #connecting to tado web interface and acquiring home id  
         @loginPromise =
           retry( () => @client.login(@config.loginname, @config.password),
           {
@@ -47,7 +48,7 @@ module.exports = (env) ->
           .catch (err) ->
             env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
             Promise.reject err
-
+      #
       deviceConfigDef = require("./device-config-schema")
 
       @framework.deviceManager.registerDeviceClass("TadoClimate", {
@@ -216,7 +217,7 @@ module.exports = (env) ->
               @emit "relativeDistance", @_relativeDistance
           Promise.resolve(mobileDevices)
       .catch (err) =>
-        env.logger.error(err)
+        env.logger.error(err.error_description || err)
         if @config.debug
           env.logger.debug("homeId= #{plugin.home.id}")
         Promise.reject(err)
