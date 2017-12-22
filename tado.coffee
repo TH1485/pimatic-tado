@@ -18,7 +18,7 @@ module.exports = (env) ->
       @client = new TadoClient
              
       # wait for pimatic to finish starting http(s) server
-      @framework.on "after init", =>
+      @framework.on "server listen", =>
         env.logger.info("Pimatic server started, initializing tado connection") 
       #connecting to tado web interface and acquiring home id  
         @loginPromise =
@@ -39,7 +39,7 @@ module.exports = (env) ->
           ).then (connected) =>
             env.logger.info("Login established, connected with tado web interface")
             return @client.me().then (home_info) =>
-              env.logger.info("Connect to #{home_info.homes[0].name} with id: #{home_info.homes[0].id}")
+              env.logger.info("Connected to #{home_info.homes[0].name} with id: #{home_info.homes[0].id}")
               if @config.debug
                 env.logger.debug(JSON.stringify(home_info))
               @setHome(home_info.homes[0])
@@ -151,7 +151,7 @@ module.exports = (env) ->
       super()
 
     requestClimate: ->
-      if plugin.loginPromise? and plugin.home?.id?
+      if plugin.loginPromise? and plugin.home?.id
         plugin.loginPromise
         .then (success) =>
           return plugin.client.state(plugin.home.id, @zone)
@@ -204,7 +204,7 @@ module.exports = (env) ->
       super()
 
     requestPresence: ->
-      if plugin.loginPromise? and plugin.home?.id?
+      if plugin.loginPromise? and plugin.home?.id
         plugin.loginPromise
         .then (success) =>
           return plugin.client.mobileDevices(plugin.home.id)
