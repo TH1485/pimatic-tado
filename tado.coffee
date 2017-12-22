@@ -16,7 +16,7 @@ module.exports = (env) ->
       
       @base = commons.base @, 'TadoPlugin'
       @client = new TadoClient
-             
+      @loginPromise = Promise.reject(new Error('tado is not logged in (yet)!'))
       # wait for pimatic to finish starting http(s) server
       @framework.once "server listen", =>
         env.logger.info("Pimatic server started, initializing tado connection") 
@@ -142,7 +142,7 @@ module.exports = (env) ->
       @lastState = null
       super()
 
-      @framework.once "after init", =>
+      @framework.once "server listen", =>
         @requestClimate()
         @requestClimateIntervalId =
           setInterval( ( => @requestClimate() ), @config.interval)
@@ -196,7 +196,7 @@ module.exports = (env) ->
       @lastState = null
       super()
       
-      @framework.once "after init", =>
+      @framework.once "server listen", =>
         @requestPresence()
         @requestPresenceIntervalId =
           setInterval( ( => @requestPresence() ), @config.interval)
