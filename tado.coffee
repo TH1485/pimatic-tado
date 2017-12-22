@@ -43,7 +43,7 @@ module.exports = (env) ->
               if @config.debug
                 env.logger.debug(JSON.stringify(home_info))
               @setHome(home_info.homes[0])
-              Promise.resolve true
+              connected
           .catch (err) ->
             env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
             Promise.reject err
@@ -108,6 +108,9 @@ module.exports = (env) ->
           , (err) ->
             env.logger.error(err.error_description || err)
             Promise.reject(err)
+        .catch (err) ->
+          env.logger.error(err.error_description || err)
+          Promise.reject(err)
 
     
     setHome: (home) ->
@@ -150,7 +153,7 @@ module.exports = (env) ->
     requestClimate: ->
       if plugin.loginPromise? and plugin.home?.id?
         plugin.loginPromise
-        .then ( (success) =>
+        .then (success) =>
           return plugin.client.state(plugin.home.id, @zone)
           .then (state) =>
             if @config.debug
@@ -160,7 +163,7 @@ module.exports = (env) ->
             @emit "temperature", @_temperature
             @emit "humidity", @_humidity
             Promise.resolve(state)
-        ).catch (err) =>
+        .catch (err) =>
           env.logger.error(err.error_description || err)
           if @config.debug
             env.logger.debug("homeId=:" + plugin.home.id)
@@ -203,7 +206,7 @@ module.exports = (env) ->
     requestPresence: ->
       if plugin.loginPromise? and plugin.home?.id?
         plugin.loginPromise
-        .then ( (success) =>
+        .then (success) =>
           return plugin.client.mobileDevices(plugin.home.id)
           .then (mobileDevices) =>
             if @config.debug
@@ -215,7 +218,7 @@ module.exports = (env) ->
                 @emit "presence", @_presence
                 @emit "relativeDistance", @_relativeDistance
             Promise.resolve(mobilDevices)
-        ).catch (err) =>
+        .catch (err) =>
           env.logger.error(err.error_description || err)
           if @config.debug
             env.logger.debug("homeId= #{plugin.home.id}")
