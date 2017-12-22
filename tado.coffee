@@ -52,14 +52,14 @@ module.exports = (env) ->
 
       @framework.deviceManager.registerDeviceClass("TadoClimate", {
         configDef: deviceConfigDef.TadoClimate,
-        createCallback: (config, lastState) ->
+        createCallback: (config, lastState) =>
           device = new TadoClimate(config, lastState,@framework)
           return device
       })
 
       @framework.deviceManager.registerDeviceClass("TadoPresence", {
         configDef: deviceConfigDef.TadoPresence,
-        createCallback: (config, lastState) ->
+        createCallback: (config, lastState) =>
           device = new TadoPresence(config, lastState,@framework)
           return device
       })
