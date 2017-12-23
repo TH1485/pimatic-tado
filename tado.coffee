@@ -142,10 +142,10 @@ module.exports = (env) ->
       @lastState = null
       super()
 
-      @framework.once "server listen", =>
-        @requestClimate()
-        @requestClimateIntervalId =
-          setInterval( ( => @requestClimate() ), @config.interval)
+      
+      @requestClimate()
+      @requestClimateIntervalId =
+        setInterval( ( => @requestClimate() ), @config.interval)
 
     destroy: () ->
       clearInterval @requestClimateIntervalId if @requestClimateIntervalId?
@@ -196,10 +196,10 @@ module.exports = (env) ->
       @lastState = null
       super()
       
-      @framework.once "server listen", =>
-        @requestPresence()
-        @requestPresenceIntervalId =
-          setInterval( ( => @requestPresence() ), @config.interval)
+      
+      @requestPresence()
+      @requestPresenceIntervalId =
+        setInterval( ( => @requestPresence() ), @config.interval)
 
     destroy: () ->
       clearInterval @requestPresenceIntervalId if @requestPresenceIntervalId?
