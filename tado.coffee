@@ -31,7 +31,7 @@ module.exports = (env) ->
           predicate: (err) ->
             try
               if @config.debug
-                env.logger.debug(err.error || err)
+                env.logger.debug(err.error || (err.code || err))
               return err.error != "invalid_grant"
             catch
               return true
@@ -45,7 +45,7 @@ module.exports = (env) ->
               @setHome(home_info.homes[0])
               connected
           .catch (err) ->
-            env.logger.error("Could not connect to tado web interface: #{(err.error_description || err)}")
+            env.logger.error("Could not connect to tado web interface: #{(err.error_description || (err.code || err) )}")
             Promise.reject err
       #
       deviceConfigDef = require("./device-config-schema")
@@ -139,6 +139,8 @@ module.exports = (env) ->
       @zone = @config.zone
       @_temperature = lastState?.temperature?.value
       @_humidity = lastState?.humidity?.value
+      @_timestampTemp = null
+      @_timestampHum = null
       @lastState = null
       super()
 
@@ -159,13 +161,15 @@ module.exports = (env) ->
           .then (state) =>
             if @config.debug
               env.logger.debug("state received: #{JSON.stringify(state)}")
-            @_temperature = state.sensorDataPoints.insideTemperature.celsius
-            @_humidity = state.sensorDataPoints.humidity.percentage
-            @emit "temperature", @_temperature
-            @emit "humidity", @_humidity
+            if state.sensorDataPoints.insideTemperature.timestamp != @_timestampTemp
+              @_temperature = state.sensorDataPoints.insideTemperature.celsius
+              @emit "temperature", @_temperature
+            if state.sensorDataPoints.humidity.timestamp != @_timestampHum
+              @_humidity = state.sensorDataPoints.humidity.percentage
+              @emit "humidity", @_humidity
             Promise.resolve(state)
         .catch (err) =>
-          env.logger.error(err.error_description || err)
+          env.logger.error(err.error_description || (err.code || err) )
           if @config.debug
             env.logger.debug("homeId=:" + plugin.home.id)
           Promise.reject(err)
@@ -216,12 +220,12 @@ module.exports = (env) ->
             for mobileDevice in mobileDevices
               if mobileDevice.id == @deviceId
                 @_presence =  mobileDevice.location.atHome
-                @_relativeDistance = mobileDevice.location.relativeDistanceFromHomeFence * 100
+                @_relativeDistance = (1-mobileDevice.location.relativeDistanceFromHomeFence) * 100
                 @emit "presence", @_presence
                 @emit "relativeDistance", @_relativeDistance
             Promise.resolve(mobileDevices)
         .catch (err) =>
-          env.logger.error(err.error_description || err)
+          env.logger.error(err.error_description || (err.code || err))
           if @config.debug
             env.logger.debug("homeId= #{plugin.home.id}")
           Promise.reject(err)
