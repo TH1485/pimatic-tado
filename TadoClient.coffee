@@ -2,7 +2,7 @@ module.exports = (env) ->
 
   class Client
 
-    request = env.require('request-promise/node_modules/request')
+    request = env.require('request')
     moment = env.require('moment')
     BASE_URL = 'https://my.tado.com'
     AUTH_URL = 'https://auth.tado.com'
